@@ -65,7 +65,7 @@ public class MyService implements KVService {
                     final int contentLength = Integer.valueOf(http.getRequestHeaders().getFirst("Content-Length"));
                     final byte[] putValue = new byte[contentLength];
 
-                    if (http.getRequestBody().read(putValue) != putValue.length) {
+                    if (http.getRequestBody().read(putValue) != putValue.length && (contentLength != 0)) {
                         throw new IOException("can not read file");
                     }
                     dao.upsert(id, putValue);
@@ -101,9 +101,6 @@ public class MyService implements KVService {
         public void handle(HttpExchange httpExchange) throws IOException {
             try {
                 delegate.handle(httpExchange);
-            } catch (IOException e) {
-                httpExchange.sendResponseHeaders(201, 0);
-                httpExchange.close();
             } catch (NoSuchElementException e) {
                 httpExchange.sendResponseHeaders(404, 0);
                 httpExchange.close();
